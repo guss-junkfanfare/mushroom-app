@@ -1,0 +1,8 @@
+# 無視する巨大ファイルや元データ
+archive.zip
+archive/
+mushroom_model_1.pt
+mushroom_model_2.pt
+
+# Macが勝手に作る見えないファイル（除外するとスッキリします）
+.DS_Store
