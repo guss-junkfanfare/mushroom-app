@@ -47,34 +47,34 @@ if uploaded_file is not None:
     # 4. 予測と確率の計算
     input_tensor = transform(image).unsqueeze(0)
 
-    with torch.no_grad():
-        outputs = model(input_tensor)
+    # with torch.no_grad():
+    outputs = model(input_tensor)
 
-        # 1. AIの注目度（ヒートマップ）を計算する
-        # targets=None にすると、AIが最も確率が高いと判定したキノコに対する注目度を自動計算します
-        grayscale_cam = cam(input_tensor=input_tensor, targets=None)[0, :]
+    # 1. AIの注目度（ヒートマップ）を計算する
+    # targets=None にすると、AIが最も確率が高いと判定したキノコに対する注目度を自動計算します
+    grayscale_cam = cam(input_tensor=input_tensor, targets=None)[0, :]
 
-        # 2. 元画像を合成用に準備する
-        # 画像サイズをAIの入力サイズ（MobileNetV2なら通常 224x224）に合わせ、0.0〜1.0の数値に変換します
-        rgb_img = np.array(image.convert("RGB"))
-        rgb_img = cv2.resize(rgb_img, (224, 224))
-        rgb_img = np.float32(rgb_img) / 255
+    # 2. 元画像を合成用に準備する
+    # 画像サイズをAIの入力サイズ（MobileNetV2なら通常 224x224）に合わせ、0.0〜1.0の数値に変換します
+    rgb_img = np.array(image.convert("RGB"))
+    rgb_img = cv2.resize(rgb_img, (224, 224))
+    rgb_img = np.float32(rgb_img) / 255
 
-        # 3. ヒートマップと元画像を合成する
-        cam_image = show_cam_on_image(rgb_img, grayscale_cam, use_rgb=True)
+    # 3. ヒートマップと元画像を合成する
+    cam_image = show_cam_on_image(rgb_img, grayscale_cam, use_rgb=True)
 
-        # 4. Streamlitで画面に表示する
-        st.write("🧠 AIが注目したポイント")
-        st.image(cam_image, use_container_width=True)
+    # 4. Streamlitで画面に表示する
+    st.write("🧠 AIが注目したポイント")
+    st.image(cam_image, use_container_width=True)
 
-        # ① 結論（0番か1番か）を取得
-        result_index = torch.argmax(outputs).item()
+    # ① 結論（0番か1番か）を取得
+    result_index = torch.argmax(outputs).item()
 
-        # ② 確率を計算
-        probabilities = F.softmax(outputs, dim=1)
+    # ② 確率を計算
+    probabilities = F.softmax(outputs, dim=1)
 
-        # 選ばれたクラスの確率をパーセント(%)に変換
-        confidence = probabilities[0][result_index].item() * 100
+    # 選ばれたクラスの確率をパーセント(%)に変換
+    confidence = probabilities[0][result_index].item() * 100
 
     # 5. 結果の表示
     result_text = class_names[result_index]
